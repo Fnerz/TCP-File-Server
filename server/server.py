@@ -171,71 +171,71 @@ class main():
         socket.send(file.file_content)
 
     def receiv_commands(self, conn, addr) -> None:
-        # try:
-        while True:
-            command = conn.recv(self.BUFFER_SIZE).decode(self.ENCODING)
-            
-
-            # putting the header and the command in separate var's               
-            if command == "UPLOAD_FILE":
-                file = self.FTP_RECV(conn) # receive the file
-                self.File_Manager.add_file(file) # add it to the file manager
-                print(f"===== Upload File: {file.file_name} SUCCESS =====") # console info output
-
-            if command == "DOWNLOAD_FILE":
-                requested_file_name: str = conn.recv(self.BUFFER_SIZE).decode(self.ENCODING) # get the name
-                requested_file: File = File("Sample Name", 1,b"Sample Bytes") # create a var for the requested file
-                
-                file_requset = self.File_Manager.search_for_file_by_name(requested_file_name) # get the file from the file manager
-
-                if file_requset[0] == False: # check if the file exists
-                    conn.send("ERROR".encode(self.ENCODING)) # sennd error code
-                    print(f"===== Downloaded File: {requested_file.file_name} FAILURE =====") # console info output
-                    continue
-
-                conn.send("NO_ERROR".encode(self.ENCODING)) # send a postive error/status code 
-
-                requested_file = file_requset[1]
-                self.FTP_SEND(requested_file,conn)
-
-                print(f"===== Downloaded File: {requested_file.file_name} SUCCESS =====") # console info output
-
-
-            if command == "REFRESH":
-                if len(self.File_Manager.Files) == 0:
-                    conn.send("ERROR".encode(self.ENCODING))
-
-                all_files = []
-                for file in self.File_Manager.Files:
-                    all_files.append(f"{file.file_name} | {round(file.file_size / 1024, 2)} KB") # a "compressed" version of the self.add_to_listbox mehtod (client)
-
-                all_files = self.HEADER_SEPARATOR.join(all_files)
-
-                conn.send(all_files.encode(self.ENCODING))
-
-                print(f"===== Refresh: SUCCESS =====") # console info output
-
-            if command == "DELETE":
-                requested_file_name: str = conn.recv(self.BUFFER_SIZE).decode(self.ENCODING)
-                requested_file = self.File_Manager.search_for_file_by_name(requested_file_name)
-                
-                removed = False
-                if requested_file[0] == True:
-                    self.File_Manager.remove_file(requested_file[1])
-                    removed = True
-
-                if removed == False:
-                    conn.send("ERROR".encode(self.ENCODING))
-                    print(f"===== Delete File: {requested_file[1].file_name} FAILURE =====") # console info output
-                    return
-                else:
-                    conn.send("DONE".encode(self.ENCODING))
-                    print(f"===== Delete File: {requested_file[1].file_name} SUCCESS =====") # console info output
+        try:
+            while True:
+                command = conn.recv(self.BUFFER_SIZE).decode(self.ENCODING)
                 
 
-        # except Exception as e:
-        #     print(e)
-        #     print("Lost connection")
+                # putting the header and the command in separate var's               
+                if command == "UPLOAD_FILE":
+                    file = self.FTP_RECV(conn) # receive the file
+                    self.File_Manager.add_file(file) # add it to the file manager
+                    print(f"===== Upload File: {file.file_name} SUCCESS =====") # console info output
+
+                if command == "DOWNLOAD_FILE":
+                    requested_file_name: str = conn.recv(self.BUFFER_SIZE).decode(self.ENCODING) # get the name
+                    requested_file: File = File("Sample Name", 1,b"Sample Bytes") # create a var for the requested file
+                    
+                    file_requset = self.File_Manager.search_for_file_by_name(requested_file_name) # get the file from the file manager
+
+                    if file_requset[0] == False: # check if the file exists
+                        conn.send("ERROR".encode(self.ENCODING)) # sennd error code
+                        print(f"===== Downloaded File: {requested_file.file_name} FAILURE =====") # console info output
+                        continue
+
+                    conn.send("NO_ERROR".encode(self.ENCODING)) # send a postive error/status code 
+
+                    requested_file = file_requset[1]
+                    self.FTP_SEND(requested_file,conn)
+
+                    print(f"===== Downloaded File: {requested_file.file_name} SUCCESS =====") # console info output
+
+
+                if command == "REFRESH":
+                    if len(self.File_Manager.Files) == 0:
+                        conn.send("ERROR".encode(self.ENCODING))
+
+                    all_files = []
+                    for file in self.File_Manager.Files:
+                        all_files.append(f"{file.file_name} | {round(file.file_size / 1024, 2)} KB") # a "compressed" version of the self.add_to_listbox mehtod (client)
+
+                    all_files = self.HEADER_SEPARATOR.join(all_files)
+
+                    conn.send(all_files.encode(self.ENCODING))
+
+                    print(f"===== Refresh: SUCCESS =====") # console info output
+
+                if command == "DELETE":
+                    requested_file_name: str = conn.recv(self.BUFFER_SIZE).decode(self.ENCODING)
+                    requested_file = self.File_Manager.search_for_file_by_name(requested_file_name)
+                    
+                    removed = False
+                    if requested_file[0] == True:
+                        self.File_Manager.remove_file(requested_file[1])
+                        removed = True
+
+                    if removed == False:
+                        conn.send("ERROR".encode(self.ENCODING))
+                        print(f"===== Delete File: {requested_file[1].file_name} FAILURE =====") # console info output
+                        return
+                    else:
+                        conn.send("DONE".encode(self.ENCODING))
+                        print(f"===== Delete File: {requested_file[1].file_name} SUCCESS =====") # console info output
+                
+
+        except Exception as e:
+            print(e)
+            print("Lost connection")
     
     def accept(self):
         self.server_socket.listen(self.BACKLOG)
@@ -248,12 +248,3 @@ class main():
 
 if __name__ == "__main__":
     main()
-
-
-#######
-#TO DO#
-#######
-
-"""
-
-"""
