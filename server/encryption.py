@@ -22,10 +22,3 @@ def decrypt_text(encrypted_message: str, key: bytes) -> str:
     decrypted_message = cipher_suite.decrypt(encrypted_message).decode()
     return decrypted_message
 
-if __name__ == "__main__":
-    message: str = "Hello, this is a secret message!"
-    encrypted_message: str = encrypt_text(message, key)
-    print(f"Encrypted Message: {encrypted_message}")
-
-    decrypted_message: str = decrypt_text(encrypted_message, key)
-    print(f"Decrypted Message: {decrypted_message}")
